@@ -1,35 +1,48 @@
 import React from 'react';
-import Board from '../Item/Board'
+import BoardForm from '../Form/boardForm';
+import Board from '../Item/Board';
 import superAgent from 'superagent';
 export default class App extends React.Component{
   constructor(props) {
     super(props);
     this.state = {};
     this.state.topics = [];
-    this.state.search = {};
-    this.state.search.subject = 'cats';
-    this.state.search.limit = 3;
+    this.state.subject = 'cats';
+    this.state.limit = 3;
   }
-
-  loadRedditBoards = async () => {
-    const REDDIT_API = `https://www.reddit.com/r/${this.state.search.subject}.json?limit=${this.state.search.limit}`;
+  //1moce searct to forms state
+  //tie form to states
+  //poass load as [props
+  loadRedditBoards = (param1, param2) => {
+    const REDDIT_API = `https://www.reddit.com/r/${param1}.json?limit=${param2}`;
     return superAgent.get(REDDIT_API)
       .then(response => {
         console.log(response);
         this.setState({
-          topics: response.data.children
+          topics: response.body.data.children
         });
       })
       .catch(err => console.log(err));
+  };
+
+  testFunc = () => {
+    this.loadRedditBoards(this.state.subject, this.state.limit);
   }
+  // updateSearch = (e) => {
+  //   this.setState({
+  //     search.subject: event.boardSubject,
+  //     search.limit: event.boardLimit
+  //    });
+  // };
 
   render(){
     return(
       <main>
-        <h1>helllo world!</h1>
-        <form onSubmit={this.loadRedditBoards}>
-          <button type='submit'>click</button>
-        </form>
+        <h1>Look For Reddit Boards</h1>
+        <BoardForm
+          loadRedditBoards={this.loadRedditBoards}
+        />
+        <button onClick={this.testFunc}>test</button>
         <ul>
           {
             this.state.topics.map(currentBoard =>
